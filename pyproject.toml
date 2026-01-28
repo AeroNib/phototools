@@ -12,7 +12,7 @@ license = {text = "MIT"}
 authors = [
     {name = "AeroNib"}
 ]
-keywords = ["photo", "exif", "rename", "automation"]
+keywords = ["photo", "exif", "rename", "automation", "thumbnail", "gallery"]
 classifiers = [
     "Development Status :: 3 - Alpha",
     "Intended Audience :: End Users/Desktop",
