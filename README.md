@@ -16,6 +16,11 @@ Or install from a local clone:
 pipx install .
 ```
 
+To upgrade an existing pipx installation to the latest version:
+```bash
+pipx upgrade phototools
+```
+
 ## Tools
 
 ### rename_images
