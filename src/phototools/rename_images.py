@@ -16,7 +16,6 @@ Usage:
         rename_images
 """
 
-import os
 import secrets
 from datetime import datetime, timedelta, timezone
 from pathlib import Path
@@ -25,7 +24,7 @@ from PIL import Image
 from PIL.ExifTags import TAGS
 
 # Configuration
-IMAGES_DIR = Path.cwd()
+SOURCE_DIR = Path.cwd()
 
 
 def get_exif_datetime(image_path):
@@ -126,7 +125,7 @@ def main():
     # Find all JPG files (case-insensitive)
     image_files = []
     for ext in ["*.jpg", "*.jpeg", "*.JPG", "*.JPEG"]:
-        image_files.extend(IMAGES_DIR.glob(ext))
+        image_files.extend(SOURCE_DIR.glob(ext))
 
     # Filter out files that already match the pattern (YYYYMMDD-HHMMSS-hex.jpg)
     import re
