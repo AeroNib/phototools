@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-# #
+#
 # This CLI utility processes all JPG files in a directory and resizes them to
 # a maximum dimension with adjustable quality to reduce file size for web display.
 
@@ -9,7 +9,7 @@ from pathlib import Path
 from PIL import Image
 
 # Default configuration
-DEFAULT_MAX_DIMENSION = 3000  # Default max JPG dimension (longest edge) in pixels
+DEFAULT_MAX_PIXELS = 3000  # Default max JPG dimension (longest edge) in pixels
 DEFAULT_QUALITY = 80  # Default JPG quality percentage
 DEFAULT_OUTPUT_DIR = "resized"
 
@@ -17,7 +17,7 @@ DEFAULT_OUTPUT_DIR = "resized"
 def resize(
     source_path,  # Path to the source image
     output_path,  # Path to save the resized image
-    max_dimension,  # Max output dimension in pixels
+    max_pixels,  # Max output height or width in pixels
     quality,  # Output JPG quality percentage
 ):
     try:
@@ -38,20 +38,20 @@ def resize(
             width, height = img.size
             max_original = max(width, height)
 
-            if max_original <= max_dimension:
+            if max_original <= max_pixels:
                 # Still re-save with quality reduction, removing EXIF data
                 img.save(output_path, quality=quality, optimize=True, exif=b"")
                 print(f"✓ Optimized quality: {source_path.name}")
                 print(f"  Size: {width}x{height} (no resize needed)")
                 return
 
-            # Calculate new dimensions maintaining aspect ratio
+            # Calculate new dimension values maintaining aspect ratio
             if width > height:
-                new_width = max_dimension
-                new_height = int((height / width) * max_dimension)
+                new_width = max_pixels
+                new_height = int((height / width) * max_pixels)
             else:
-                new_height = max_dimension
-                new_width = int((width / height) * max_dimension)
+                new_height = max_pixels
+                new_width = int((width / height) * max_pixels)
 
             # Resize image
             img_resized = img.resize((new_width, new_height), Image.Resampling.LANCZOS)
@@ -87,10 +87,10 @@ def main():
     )
 
     parser.add_argument(
-        "--dimension",
+        "--pixels",
         type=int,
-        default=DEFAULT_MAX_DIMENSION,
-        help="Output max dimension of longest side in pixels",
+        default=DEFAULT_MAX_PIXELS,
+        help="Output max size of longest side in pixels",
     )
 
     parser.add_argument(
@@ -119,7 +119,7 @@ def main():
 
     print(f"Found {len(image_files)} image(s) to process")
     print("=== Process Parameters ===")
-    print(f"Max dimension: {args.dimension}px")
+    print(f"Max height or width: {args.pixels}px")
     print(f"Quality: {args.quality}%")
     print("==========================")
     print(f"\nProcessing images from {source_dir} to {output_dir}...\n")
@@ -133,7 +133,7 @@ def main():
         output_path = output_dir / source_path.name
 
         # Resize and optimize
-        resize(source_path, output_path, args.dimension, args.quality)
+        resize(source_path, output_path, args.pixels, args.quality)
         print()
 
     print(f"Done! Processed {len(image_files)} image(s)")
