@@ -1,0 +1,38 @@
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[project]
+name = "phototools"
+version = "0.1.0"
+description = "Tools for automating photo workflows"
+readme = "README.md"
+requires-python = ">=3.7"
+license = {text = "MIT"}
+authors = [
+    {name = "AeroNib"}
+]
+keywords = ["photo", "exif", "rename", "automation"]
+classifiers = [
+    "Development Status :: 3 - Alpha",
+    "Intended Audience :: End Users/Desktop",
+    "License :: OSI Approved :: MIT License",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.7",
+    "Programming Language :: Python :: 3.8",
+    "Programming Language :: Python :: 3.9",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+]
+dependencies = [
+    "pillow>=9.0.0",
+]
+
+[project.urls]
+Homepage = "https://github.com/yourusername/phototools"
+Repository = "https://github.com/yourusername/phototools"
+Issues = "https://github.com/yourusername/phototools/issues"
+
+[project.scripts]
+rename_images = "phototools.rename_images:main"
