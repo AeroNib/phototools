@@ -20,8 +20,10 @@ Usage:
         rename_photos
 """
 
+import io
 import re
 import secrets
+import struct
 from collections import defaultdict
 from datetime import datetime, timedelta, timezone
 from pathlib import Path
@@ -37,9 +39,60 @@ RENAMED_PATTERN = re.compile(
 )
 
 
+def _extract_raf_jpeg(file_path):
+    """
+    Extract the embedded JPEG from a Fujifilm RAF file.
+
+    RAF header structure (big-endian):
+        0-15:   magic "FUJIFILMCCD-RAW "
+        16-19:  format version
+        20-27:  unknown
+        28-59:  camera model (32 bytes)
+        60-63:  unknown
+        64-67:  unknown
+        68-71:  unknown
+        84-87:  JPEG offset (uint32)
+        88-91:  JPEG length (uint32)
+
+    Returns:
+        BytesIO of the embedded JPEG, or None if not found
+    """
+    with open(file_path, "rb") as f:
+        magic = f.read(16)
+        if not magic.startswith(b"FUJIFILMCCD-RAW"):
+            return None
+
+        # Read JPEG offset and length at bytes 84-91
+        f.seek(84)
+        jpeg_offset, jpeg_length = struct.unpack(">II", f.read(8))
+
+        if jpeg_offset == 0 or jpeg_length == 0:
+            return None
+
+        f.seek(jpeg_offset)
+        jpeg_data = f.read(jpeg_length)
+
+    return io.BytesIO(jpeg_data)
+
+
+def _parse_exif_tags(file_handle):
+    """Parse EXIF tags from a file handle and return a datetime or None."""
+    tags = exifread.process_file(file_handle, stop_tag="DateTimeOriginal", details=False)
+
+    for tag_name in ("EXIF DateTimeOriginal", "Image DateTime"):
+        if tag_name in tags:
+            dt_str = str(tags[tag_name])
+            return datetime.strptime(dt_str, "%Y:%m:%d %H:%M:%S")
+
+    return None
+
+
 def get_exif_datetime(file_path):
     """
-    Extract the datetime from EXIF data using exifread.
+    Extract the datetime from EXIF data.
+
+    For RAF files, extracts the embedded JPEG and reads EXIF from that.
+    For other formats, reads EXIF directly via exifread.
 
     Args:
         file_path: Path to the image file
@@ -48,21 +101,14 @@ def get_exif_datetime(file_path):
         datetime object or None if not found
     """
     try:
-        with open(file_path, "rb") as f:
-            tags = exifread.process_file(f, stop_tag="DateTimeOriginal", details=False)
-
-        # Prefer DateTimeOriginal, fall back to DateTime
-        dt_str = None
-        for tag_name in ("EXIF DateTimeOriginal", "Image DateTime"):
-            if tag_name in tags:
-                dt_str = str(tags[tag_name])
-                break
-
-        if not dt_str:
-            return None
-
-        # EXIF datetime format: "2024:01:23 14:30:00"
-        return datetime.strptime(dt_str, "%Y:%m:%d %H:%M:%S")
+        if file_path.suffix.lower() == ".raf":
+            jpeg_data = _extract_raf_jpeg(file_path)
+            if jpeg_data is None:
+                return None
+            return _parse_exif_tags(jpeg_data)
+        else:
+            with open(file_path, "rb") as f:
+                return _parse_exif_tags(f)
 
     except Exception as e:
         print(f"  Warning: Could not read EXIF from {file_path.name}: {e}")
