@@ -4,7 +4,7 @@ build-backend = "hatchling.build"
 
 [project]
 name = "phototools"
-version = "0.2.0"
+version = "0.3.0"
 description = "Tools for automating photo workflows"
 readme = "README.md"
 requires-python = ">=3.7"
@@ -26,6 +26,7 @@ classifiers = [
     "Programming Language :: Python :: 3.12",
 ]
 dependencies = [
+    "exifread>=3.0.0",
     "pillow>=9.0.0",
 ]
 
@@ -38,3 +39,4 @@ Issues = "https://github.com/AeroNib/phototools/issues"
 rename_images = "phototools.rename_images:main"
 resize_images = "phototools.resize_images:main"
 generate_thumbs = "phototools.generate_thumbs:main"
+rename_photos = "phototools.rename_photos:main"
