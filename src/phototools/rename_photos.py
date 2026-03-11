@@ -1,10 +1,11 @@
 #!/usr/bin/env python3
 """
-Photo Renamer for Photo Gallery
+Photo Rename to Date-Time
 
 This script renames photo sets in the current directory using their EXIF timestamp
-converted to UTC datetime. Files sharing the same base name but different extensions
-(e.g., IMG_1234.jpg and IMG_1234.RAF) are treated as a set and given the same new name.
+converted to UTC datetime (assumes EXIF is in EST). Files sharing the same base name
+but different extensions (e.g., IMG_1234.jpg and IMG_1234.RAF) are treated as a set
+and given the same new name.
 
 Format: {YYYYMMDD-HHMMSS}[-{seq}]-{4hex}.{ext}
 Examples:

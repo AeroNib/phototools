@@ -23,7 +23,24 @@ pipx upgrade phototools
 
 ## Tools
 
+### rename_photos
+
+Renames photo files based on their EXIF timestamp.
+
+**Format:** `{YYYYMMDD-HHMMSS}-{optional sequence}-{4hex}.jpg`  
+**Example:** `20240123-143000-01-a3f5.jpg`
+
+It processes groups of files with the same original file name as a set, e.g., `IMG_0001.JPG` and `IMG_0001.RAF` are assumed to be two file formats of the same photo and will be renamed together with the same new file name with the appropriate file extension. Files that already match the new file format are skipped.
+
+EXIF timestamps are assumed to be in EST and will be converted to UTC. Handling different time zones may be added in a future version.
+
+Renaming adds up to two suffixes to handle possible filename collisions. First, all names are suffixed with a four random characters. Second, if two or more file sets in a run have the same time stamp, an optional two-digit sequence is added between the time stamp and four-digit suffix. This sequence is ordered to preserve the original file order.
+
+
 ### rename_images
+
+> [!IMPORTANT]
+> `rename_images` has been superseded by `rename_photos`, but it has been kept for now for compatibility. `rename_photos` is more powerful and can handle photo file sets, including raw photo files.
 
 Renames JPG files based on their EXIF timestamp, converting to UTC format. Four random characters are appended to avoid filename collisions. 
 
